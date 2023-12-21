@@ -1,60 +1,45 @@
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JFrame;
+import java.awt.BorderLayout;
 
-public class Main {
+
+public class Main extends JFrame {
+    private JButton hitButton;
+    private JButton standButton;
+    private JLabel playerLabel;
+    private JLabel dealerLabel;
+
+    public Main() {
+        // Set up JFrame properties
+        setTitle("Blackjack Game");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Create components
+        hitButton = new JButton("Hit");
+        standButton = new JButton("Stand");
+        playerLabel = new JLabel("Player's Hand: ");
+        dealerLabel = new JLabel("Dealer's Hand: ");
+
+        // Create a panel to hold the buttons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(hitButton);
+        buttonPanel.add(standButton);
+
+        // Set up layout
+        setLayout(new BorderLayout());
+        add(buttonPanel, BorderLayout.SOUTH);
+        add(playerLabel, BorderLayout.WEST);
+        add(dealerLabel, BorderLayout.EAST);
+        // Add other initialization as needed
+    }
 
     public static void main(String[] args) {
-        // Create and set up the JFrame
-        JFrame frame = new JFrame("BlackJack");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 400); // Set the size of the frame
-
-        // Create a JButton
-        JButton dealButton = new JButton("Play Now!!");
-        JButton hitButton = new JButton("Hit");
-        JButton standButton = new JButton("Stand");
-        JLabel resultLabel = new JLabel("Welcome to Blackjack!");
-
-
-
-        // Create a JLabel to display messages
-        JLabel label = new JLabel("Welcome to BlackJack!!");
-
-        // Add an ActionListener to the button
-        dealButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // Change the text when the button is clicked
-                label.setText("Let us Begin!");
-            }
-        });
-
-        hitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // Change the text when the button is clicked
-                label.setText("Let us Begin!");
-            }
-        });
-
-        standButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // Change the text when the button is clicked
-                label.setText("Let us Begin!");
-            }
-        });
-
-        // Create a JPanel to hold the components
-        JPanel panel = new JPanel();
-        panel.add(dealButton);
-        panel.add(hitButton);
-        panel.add(standButton);
-        panel.add(resultLabel);
-        frame.add(panel);
-
-        // Add the panel to the frame
-        frame.add(panel);
-
-        // Set the frame to be visible
-        frame.setVisible(true);
+        // Create an instance of the GUI
+        Main gameGUI = new Main();
+        // Make the frame visible
+        gameGUI.setVisible(true);
     }
 }

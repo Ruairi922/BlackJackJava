@@ -1,126 +1,134 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.Scanner;
 
 public class logic {
-    Scanner input = new Scanner(System.in);
-    // create the deck
-    String[] suits = {"Spades", "Hearts", "Diamonds", "Clubs"};
-    String[] value = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "K", "Q", "A"};
-    String[] deck = new String[52];
-    int index = 0;
+    private static final String[] SUITS = {"Spades", "Hearts", "Diamonds", "Clubs"};
+    private static final String[] VALUES = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"};
 
-    List<String> playerHand = new ArrayList<>();
-    List<String> dealerHand = new ArrayList<>();
+    private List<String> deck;
+    private List<String> playerHand;
+    private List<String> dealerHand;
+
+    private Scanner scanner;
 
     public logic() {
-        // Initialize the deck in the constructor
-        for (int i = 0; i < 13; i++) {
-            for (int j = 0; j < 4; j++) {
-                deck[index] = value[i] + " of " + suits[j];
-                index++;
+        deck = new ArrayList<>();
+        playerHand = new ArrayList<>();
+        dealerHand = new ArrayList<>();
+        scanner = new Scanner(System.in);
+    }
+
+    private void initializeDeck() {
+        for (String suit : SUITS) {
+            for (String value : VALUES) {
+                deck.add(value + " of " + suit);
             }
         }
     }
 
-    // create a shuffle deck method
-    public void shuffleDeck() {
-        Random random = new Random();
+    private void shuffleDeck() {
+        Collections.shuffle(deck);
+    }
 
-        for (int i = deck.length - 1; i > 0; i--) {
-            int randIndex = random.nextInt(i + 1);
-
-            // Swap deck[i] and deck[randIndex]
-            String temp = deck[i];
-            deck[i] = deck[randIndex];
-            deck[randIndex] = temp;
+    private void dealInitialCards() {
+        for (int i = 0; i < 2; i++) {
+            playerHand.add(deck.remove(0));
+            dealerHand.add(deck.remove(0));
         }
     }
 
-    public List<String> dealInitialCards() {
-        // Deal two cards to the player and two cards to the dealer
-        Random random = new Random();
-        // TODO: Implement logic for dealing initial cards
-        // player and dealer need two cards each
-        playerHand.add(deck[0]);
-        playerHand.add(deck[1]);
+    private int calculateHandValue(List<String> hand) {
+        int value = 0;
+        int numAces = 0;
 
-        dealerHand.add(deck[random.nextInt(52)]);
-        dealerHand.add(deck[random.nextInt(52)]);
+        for (String card : hand) {
+            String cardValue = card.split(" ")[0];
 
-        System.out.println("You have been dealt:");
-        for(String elem:playerHand){
-            System.out.println(elem);
+            if ("JQK".contains(cardValue)) {
+                value += 10;
+            } else if ("A".equals(cardValue)) {
+                numAces++;
+                value += 11;
+            } else {
+                value += Integer.parseInt(cardValue);
+            }
         }
-        System.out.println();
-        return playerHand;
+
+        while (numAces > 0 && value > 21) {
+            value -= 10;
+            numAces--;
+        }
+
+        return value;
     }
 
-    public int calculateHandValue() {
-        // Implement logic to calculate the value of a hand
-        // (sum up card values, consider Aces as 1 or 11)
-        // Return the total hand value
-        int valueOfHand = 0;
-        int index = 0;
-        String numOfCard = "";
+    private void displayHands(boolean showDealerCard) {
+        System.out.println("Player's Hand: " + playerHand + " (Total: " + calculateHandValue(playerHand) + ")");
+        System.out.println("Dealer's Hand: " + (showDealerCard ? dealerHand : dealerHand.get(0) + " [Hidden]"));
+    }
 
-        for(int i = 0; i < playerHand.size(); i++){
-            numOfCard = playerHand.get(index).substring(0,2);
-            if(numOfCard.equals("J ") || numOfCard.equals("K ") || numOfCard.equals("Q ")  || numOfCard.equals("10")){
-                valueOfHand += 10;
-            }else if(numOfCard.equals("A ")){
-                if(valueOfHand <= 10){
-                    valueOfHand += 11;
-                }else{
-                    valueOfHand += 1;
+    private void playerTurn() {
+        while (true) {
+            displayHands(true);
+            System.out.print("Do you want to hit or stand? (h/s): ");
+            String choice = scanner.next().toLowerCase();
+
+            if ("h".equals(choice)) {
+                playerHand.add(deck.remove(0));
+                if (calculateHandValue(playerHand) > 21) {
+                    displayHands(true);
+                    System.out.println("Bust! You lose.");
+                    return;
                 }
-            }else{
-                valueOfHand += Integer.parseInt(numOfCard.substring(0,1));
-            }
-            index++;
-        }
-        return valueOfHand;
-    }
-
-    public void playerHit() {
-        // Implement logic for the player to receive an additional card
-        // Check for bust conditions
-        Random random = new Random();
-        System.out.println("Press 'h' to hit");
-        String userHit = input.nextLine();
-        String newCard = "";
-        while(userHit.equals("h")){
-            newCard = deck[random.nextInt(52)];
-            playerHand.add(newCard);
-            System.out.println("you have got a " + newCard);
-            userHit = input.nextLine();
-            if(userHit.equals("h") == false){
+            } else if ("s".equals(choice)) {
                 break;
+            } else {
+                System.out.println("Invalid choice. Please enter 'h' or 's'.");
             }
         }
-
     }
 
-    public void dealerTurn() {
-        // Implement logic for the dealer's turn
-        // Dealer hits until their hand value is at least 17
+    private void dealerTurn() {
+        while (calculateHandValue(dealerHand) < 17) {
+            dealerHand.add(deck.remove(0));
+        }
     }
 
-    public void determineWinner() {
-        // Implement logic to determine the winner based on hand values
+    private void determineWinner() {
+        displayHands(true);
+
+        int playerTotal = calculateHandValue(playerHand);
+        int dealerTotal = calculateHandValue(dealerHand);
+
+        if (playerTotal > 21 || (dealerTotal <= 21 && dealerTotal > playerTotal)) {
+            System.out.println("Dealer wins!");
+        } else if (dealerTotal > 21 || playerTotal > dealerTotal) {
+            System.out.println("Congratulations! You win!");
+        } else {
+            System.out.println("It's a tie!");
+        }
     }
 
-    public void resetGame() {
-        // Reset the game state for a new round
+    public void playGame() {
+        System.out.println("Welcome to Blackjack!");
+
+        initializeDeck();
+        shuffleDeck();
+        dealInitialCards();
+
+        playerTurn();
+        if (calculateHandValue(playerHand) <= 21) {
+            dealerTurn();
+            determineWinner();
+        }
+
+        scanner.close();
     }
 
     public static void main(String[] args) {
-        // TODO: Implement main method
-        logic start = new logic();
-        start.shuffleDeck();
-        start.dealInitialCards();
-        System.out.println("Your cureent total is: " + start.calculateHandValue());
-        start.playerHit();
+        logic game = new logic();
+        game.playGame();
     }
 }
