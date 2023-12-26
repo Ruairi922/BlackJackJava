@@ -7,9 +7,9 @@ public class logic {
     private static final String[] SUITS = {"Spades", "Hearts", "Diamonds", "Clubs"};
     private static final String[] VALUES = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"};
 
-    private List<String> deck;
-    private List<String> playerHand;
-    private List<String> dealerHand;
+    List<String> deck;
+    List<String> playerHand;
+    List<String> dealerHand;
 
     private Scanner scanner;
 
@@ -39,7 +39,7 @@ public class logic {
         }
     }
 
-    private int calculateHandValue(List<String> hand) {
+    int calculateHandValue(List<String> hand) {
         int value = 0;
         int numAces = 0;
 
@@ -65,8 +65,8 @@ public class logic {
     }
 
     private void displayHands(boolean showDealerCard) {
-        System.out.println("Player's Hand: " + playerHand + " (Total: " + calculateHandValue(playerHand) + ")");
-        System.out.println("Dealer's Hand: " + (showDealerCard ? dealerHand : dealerHand.get(0) + " [Hidden]"));
+        System.out.println("You have: " + playerHand + " (Your Total is: " + calculateHandValue(playerHand) + ")");
+        System.out.println("Dealer has: " + dealerHand + " (Dealer Total is: " + calculateHandValue(dealerHand) + ")");
     }
 
     private void playerTurn() {
@@ -90,7 +90,7 @@ public class logic {
         }
     }
 
-    private void dealerTurn() {
+    void dealerTurn() {
         while (calculateHandValue(dealerHand) < 17) {
             dealerHand.add(deck.remove(0));
         }
@@ -112,7 +112,10 @@ public class logic {
     }
 
     public void playGame() {
-        System.out.println("Welcome to Blackjack!");
+        playerHand.clear();
+        dealerHand.clear();
+
+        System.out.println("WELCOME TO BLACKJACK!!");
 
         initializeDeck();
         shuffleDeck();
@@ -124,11 +127,20 @@ public class logic {
             determineWinner();
         }
 
-        scanner.close();
+        // Do not close the scanner here
     }
 
     public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
         logic game = new logic();
         game.playGame();
+
+        System.out.println("Do you want to play again?(y/n): ");
+        String playAgain = input.nextLine();
+        if(playAgain.equals("y")){
+            game.playGame();
+        } else if(playAgain.equals("n")){
+            System.out.println("Thanks for playing!");
+        }
     }
 }
